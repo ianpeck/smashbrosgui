@@ -1,0 +1,5 @@
+- GUI 
+    + that inserts data to db as ETL
+    + is able to live query the inserted data for stats
+    + Intellisense (like Symbol Search)?
+- Pictures for Fighters/Locations
