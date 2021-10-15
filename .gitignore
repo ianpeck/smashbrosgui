@@ -5,6 +5,7 @@ __pycache__/
 config.py
 *.py[cod]
 *$py.class
+secrets.env
 
 # C extensions
 *.so
