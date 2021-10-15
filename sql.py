@@ -13,12 +13,11 @@ region = "us-east-2a"
 dbname = os.environ.get('awsdb')
 
 
-# ========= Functions =========
-
+# ========= Functions =========n
 def query_sql(query):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
         cur = connection.cursor()
         cur.execute(query)
         fighter = cur.fetchall()
-        print(fighter)
+        return fighter

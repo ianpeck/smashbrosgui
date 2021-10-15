@@ -1,4 +1,5 @@
 import sql as s
 
-s.query_sql("call SmashBros.headtohead('Kirby','Luigi');")
+data = s.query_sql("call SmashBros.headtohead('Kirby','Luigi');")
 
+print(data)

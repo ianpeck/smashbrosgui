@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QAction, QTabWidget,QVBoxLayout
 import sys
+from PyQt5.QtCore import QFile, QTextStream
 
 
 class Window(QMainWindow):
@@ -35,7 +36,7 @@ class MyTableWidget(QWidget):
         self.tabs.addTab(self.tab1, "Head to Head")
         self.tabs.addTab(self.tab2, "Stats")
 
-        # Create first tab
+        # Create Head to Head tab
         self.tab1.layout = QVBoxLayout(self)
         self.pushButton1 = QPushButton("Check Stats")
         self.tab1.layout.addWidget(self.pushButton1)
