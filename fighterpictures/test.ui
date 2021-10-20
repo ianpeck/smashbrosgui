@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1440</width>
-    <height>900</height>
+    <height>792</height>
    </rect>
   </property>
   <property name="palette">
@@ -455,120 +455,646 @@
   <property name="windowTitle">
    <string>Super Smash Bros</string>
   </property>
-  <widget class="QLabel" name="image1">
+  <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>1010</x>
-     <y>30</y>
-     <width>221</width>
-     <height>231</height>
+     <x>0</x>
+     <y>0</y>
+     <width>1431</width>
+     <height>901</height>
     </rect>
    </property>
-   <property name="styleSheet">
-    <string notr="true"/>
+   <property name="tabShape">
+    <enum>QTabWidget::Rounded</enum>
    </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
+   <property name="currentIndex">
+    <number>0</number>
    </property>
-   <property name="text">
-    <string/>
+   <property name="elideMode">
+    <enum>Qt::ElideNone</enum>
    </property>
-   <property name="pixmap">
-    <pixmap>../../../../Downloads/main.png</pixmap>
-   </property>
-   <property name="scaledContents">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="image2">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>30</y>
-     <width>221</width>
-     <height>231</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::NoFrame</enum>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="FighterTextBox1">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>270</y>
-     <width>161</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Enter Fighter 1</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="FighterTextBox2">
-   <property name="geometry">
-    <rect>
-     <x>1040</x>
-     <y>270</y>
-     <width>161</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Enter Fighter 2</string>
-   </property>
-   <property name="frame">
-    <bool>true</bool>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="CheckStatsButton">
-   <property name="geometry">
-    <rect>
-     <x>650</x>
-     <y>470</y>
-     <width>131</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Check Stats</string>
-   </property>
-  </widget>
-  <widget class="QTableView" name="tableView">
-   <property name="geometry">
-    <rect>
-     <x>195</x>
-     <y>320</y>
-     <width>251</width>
-     <height>521</height>
-    </rect>
-   </property>
-   <property name="showGrid">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QTableView" name="tableView_2">
-   <property name="geometry">
-    <rect>
-     <x>990</x>
-     <y>320</y>
-     <width>251</width>
-     <height>521</height>
-    </rect>
-   </property>
-   <property name="showGrid">
-    <bool>true</bool>
-   </property>
+   <widget class="QWidget" name="HeadToHeadtab">
+    <attribute name="title">
+     <string>Head to Head</string>
+    </attribute>
+    <widget class="QTableWidget" name="tableWidget2">
+     <property name="geometry">
+      <rect>
+       <x>860</x>
+       <y>290</y>
+       <width>531</width>
+       <height>511</height>
+      </rect>
+     </property>
+     <property name="showGrid">
+      <bool>true</bool>
+     </property>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (Total)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (At Location)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (Match Type)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (This Season)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (in the Month of)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (for Championship)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (at PPV)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>at Location</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Match Type</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>in Championship matches</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>at PPV</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Defending Title</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Total Record</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Season Record</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>This Month so far</string>
+      </property>
+     </row>
+     <column>
+      <property name="text">
+       <string>Wins</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Losses</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>W/L %</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QLineEdit" name="FighterTextBox2">
+     <property name="geometry">
+      <rect>
+       <x>1040</x>
+       <y>250</y>
+       <width>161</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Fighter 2</string>
+     </property>
+     <property name="frame">
+      <bool>true</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="image1">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>10</y>
+       <width>221</width>
+       <height>231</height>
+      </rect>
+     </property>
+     <property name="toolTipDuration">
+      <number>0</number>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="FighterTextBox1">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>250</y>
+       <width>161</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Fighter 1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="image2">
+     <property name="geometry">
+      <rect>
+       <x>1010</x>
+       <y>10</y>
+       <width>221</width>
+       <height>231</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap>../../../../Downloads/main.png</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="MapTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>250</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Map</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="imageStage">
+     <property name="geometry">
+      <rect>
+       <x>490</x>
+       <y>10</y>
+       <width>451</width>
+       <height>231</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>250</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Map:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>290</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>MT:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>330</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Season:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="SeasonTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>330</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Season</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="MatchTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>290</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Match Type</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="MonthTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>370</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Month</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>370</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Month:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="WeekTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>410</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Week</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>410</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Week:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="PPVTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>450</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter PPV</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>450</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PPV:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="ChampTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>490</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Championship</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>490</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Champ:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="ContenderTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>530</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>#1 Contender Match?</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>530</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>#1con:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="BrandTextBox">
+     <property name="geometry">
+      <rect>
+       <x>630</x>
+       <y>570</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Enter Brand</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>570</y>
+       <width>60</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Brand:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="CheckStatsButton">
+     <property name="geometry">
+      <rect>
+       <x>650</x>
+       <y>610</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Check Stats</string>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tableWidget1">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>290</y>
+       <width>531</width>
+       <height>511</height>
+      </rect>
+     </property>
+     <property name="showGrid">
+      <bool>true</bool>
+     </property>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (Total)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (At Location)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (Match Type)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (This Season)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (in the Month of)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (for Championship)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Vs.  Other Fighter (at PPV)</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>at Location</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Match Type</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>in Championship matches</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>at PPV</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Defending Title</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Total Record</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>Season Record</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>This Month so far</string>
+      </property>
+     </row>
+     <column>
+      <property name="text">
+       <string>Wins</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Losses</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>W/L %</string>
+      </property>
+     </column>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="LoadDataTab">
+    <attribute name="title">
+     <string>Load Data</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="AdvancedStatsTab">
+    <attribute name="title">
+     <string>Advanced Fighter Stats</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="GraphTab">
+    <attribute name="title">
+     <string>Graphs</string>
+    </attribute>
+   </widget>
   </widget>
  </widget>
  <resources/>

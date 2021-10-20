@@ -3,6 +3,7 @@ import mysql.connector
 import sys
 import boto3
 import os
+import itertools
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -24,28 +25,25 @@ def query_sql(query):
     with connection:
         cur = connection.cursor()
         cur.execute(query)
-        fighter = cur.fetchall()
-        return fighter
-
-# ========= Class? ===========
-# class MySQLConnection:
-#     def __init__(self, endpoint, user, password, port, region, dbname):
-#         self.endpoint = endpoint
-#         self.user = user
-#         self.password = password
-#         self.port = port
-#         self.region = region
-#         self.dbname = dbname
-#         self.connection = None
-
-#     def connect(self):
-#         self.connection = pymysql.connect(host=self.endpoint, database=self.dbname, user=self.user, port=self.port, password=self.password)
-#         return self.connection
-    
-#     def query(self, query):
-#         with self.connection:
-#             cur = self.connection.cursor()
-#             data = cur.execute(query)
-#             rows = data.fetchall()
-#             return rows
+        fighter_data = cur.fetchone()
+        print(fighter_data)
+        fighter1_dict = {}
+        fighter2_dict = {}
+        # Parse One Line Tuple
+        for i, data in enumerate(fighter_data):
+            if i == 0:
+                fighter1_dict['Fighter'] = data
+            elif i == 1:
+                fighter1_dict['Wins'] = str(data)
+                fighter2_dict['Losses'] = str(data)
+            elif i == 2:
+                fighter1_dict['W/L %'] = data
+            elif i == 3:
+                fighter2_dict['Fighter'] = data
+            elif i == 4:
+                fighter2_dict['Wins'] = str(data)
+                fighter1_dict['Losses'] = str(data)
+            elif i == 5:
+                fighter2_dict['W/L %'] = data
+        return [fighter1_dict, fighter2_dict]
 

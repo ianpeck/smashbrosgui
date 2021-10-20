@@ -192,6 +192,7 @@ class Ui_SmashUI(object):
         self.FighterTextBox1.setAlignment(QtCore.Qt.AlignCenter)
         self.FighterTextBox1.setObjectName("FighterTextBox1")
         self.FighterTextBox1.setCompleter(fighter_name_completer)
+        
         self.FighterTextBox2 = QtWidgets.QLineEdit(SmashUI)
         self.FighterTextBox2.setGeometry(QtCore.QRect(1040, 270, 161, 22))
         self.FighterTextBox2.setFrame(True)
@@ -224,7 +225,7 @@ class Ui_SmashUI(object):
         self.FighterTextBox2.setText(_translate("SmashUI", "Enter Fighter 2"))
         self.CheckStatsButton.setText(_translate("SmashUI", "Check Stats"))
 
-    def checkStats(self, SmashUI):
+    def checkStats(self):
         self.image1.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox2.text().lower().replace(' ', '').replace('.','').replace('&', 'and'))))
         self.image2.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox1.text().lower().replace(' ', '').replace('.','').replace('&','and'))))
 
