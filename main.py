@@ -1,5 +1,5 @@
 import sql as s
 
-data = s.query_sql("call SmashBros.headtohead('Mario');")
-
+data = s.select_list('SELECT * FROM Location')
 print(data)
+

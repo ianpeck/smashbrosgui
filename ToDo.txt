@@ -6,3 +6,4 @@
 - Advanced Stats Tab
 - Fix Tab Colors
 - Check Stats Button connects with other SP to fill out rest of TableWidget
+- What if Completers only suggested things that fighters particpated in (certain maps specifically)

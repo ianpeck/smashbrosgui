@@ -20,13 +20,12 @@ region = "us-east-2a"
 dbname = os.environ.get('awsdb')
 
 # ========= Functions =========
-def query_sql(query):
+def h2h_query_sql(query):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
         cur = connection.cursor()
         cur.execute(query)
         fighter_data = cur.fetchone()
-        print(fighter_data)
         fighter1_dict = {}
         fighter2_dict = {}
         # Parse One Line Tuple
@@ -46,4 +45,15 @@ def query_sql(query):
             elif i == 5:
                 fighter2_dict['W/L %'] = data
         return [fighter1_dict, fighter2_dict]
+
+def select_list(query, columnnumber):
+    connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
+    with connection:
+        cur = connection.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+        dataList = []
+        for row in data:
+            dataList.append(row[columnnumber])
+        return dataList
 
