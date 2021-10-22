@@ -1,9 +1,5 @@
 import pymysql
-import mysql.connector
-import sys
-import boto3
 import os
-import itertools
 from dotenv import load_dotenv
 from pathlib import Path
 
