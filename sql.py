@@ -57,3 +57,13 @@ def select_list(query, columnnumber):
             dataList.append(row[columnnumber])
         return dataList
 
+def select_view_row(query):
+    connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
+    with connection:
+        cur = connection.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+        dataList = []
+        for row in data:
+            dataList.append(row)
+        return dataList

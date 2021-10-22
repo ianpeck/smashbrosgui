@@ -336,6 +336,7 @@ class Ui_SmashUI(object):
         ppv_list = s.select_list('SELECT * FROM PPV', 1)
         ppv_list_completer = QtWidgets.QCompleter(ppv_list)
         ppv_list_completer.setCaseSensitivity(0)
+        ppv_list_completer.setCompletionMode(1)
 
         self.PPVTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
         self.PPVTextBox.setGeometry(QtCore.QRect(630, 450, 171, 22))
@@ -351,6 +352,7 @@ class Ui_SmashUI(object):
         champ_list = s.select_list('SELECT * FROM Championship', 1)
         champ_list_completer = QtWidgets.QCompleter(champ_list)
         champ_list_completer.setCaseSensitivity(0)
+        champ_list_completer.setCompletionMode(1)
 
         self.ChampTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
         self.ChampTextBox.setGeometry(QtCore.QRect(630, 490, 171, 22))
@@ -472,7 +474,7 @@ class Ui_SmashUI(object):
         item = self.tableWidget2.verticalHeaderItem(2)
         item.setText(_translate("SmashUI", "Vs.  Other Fighter (Match Type)"))
         item = self.tableWidget2.verticalHeaderItem(3)
-        item.setText(_translate("SmashUI", "Vs.  Other Fighter (This Season)"))
+        item.setText(_translate("SmashUI", "Vs.  Other Fighter (in the Season of)"))
         item = self.tableWidget2.verticalHeaderItem(4)
         item.setText(_translate("SmashUI", "Vs.  Other Fighter (in the Month of)"))
         item = self.tableWidget2.verticalHeaderItem(5)
@@ -531,7 +533,7 @@ class Ui_SmashUI(object):
         item = self.tableWidget1.verticalHeaderItem(2)
         item.setText(_translate("SmashUI", "Vs.  Other Fighter (Match Type)"))
         item = self.tableWidget1.verticalHeaderItem(3)
-        item.setText(_translate("SmashUI", "Vs.  Other Fighter (This Season)"))
+        item.setText(_translate("SmashUI", "Vs.  Other Fighter (in the Season of)"))
         item = self.tableWidget1.verticalHeaderItem(4)
         item.setText(_translate("SmashUI", "Vs.  Other Fighter (in the Month of)"))
         item = self.tableWidget1.verticalHeaderItem(5)
@@ -569,7 +571,8 @@ class Ui_SmashUI(object):
         # Change Pictures
         self.image1.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox1.text().lower().replace(' ', '').replace('.','').replace('&', 'and'))))
         self.image2.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox2.text().lower().replace(' ', '').replace('.','').replace('&','and'))))
-        self.imageStage.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/stagepictures/{}.png".format(self.MapTextBox.text().lower())))
+        self.imageStage.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/stagepictures/{}.png".format(self.MapTextBox.text().lower().replace(' ','').replace(',','').replace("'",'').replace('(','').replace(')','').replace('-',''))))
+        
         # Initialize Variables
         fighter1 = self.FighterTextBox1.text()
         fighter2 = self.FighterTextBox2.text()
@@ -582,17 +585,43 @@ class Ui_SmashUI(object):
         championship = self.ChampTextBox.text()
         contender = self.ContenderTextBox.text()
         brand = self.BrandTextBox.text()
+        dataIndy = []
         dataH2H = []
-        fighter_names = ["Bayonetta", "Bowser", "Bowser Jr.", "Captain Falcon", "Chrom", "Cloud", "Corrin", "Daisy",
-         "Dark Pit", "Dark Samus", "Diddy Kong", "DK", "Dr. Mario", "Duck Hunt", "Erdrick", "Falco", "Fox", 
-         "Ganondorf", "Greninja", "Ice Climbers", "Ike", "Incineroar", "Inkling", "Isabelle", "Jigglypuff", "Joker", 
-         "King Dedede", "King K. Rool", "Kirby", "Ken", "Link", "Little Mac", "Lucario", "Lucas", "Lucina", 
-         "Luigi", "Mario", "Marth", "Mega Man", "Meta Knight", "Mewtwo", "Mr. Game & Watch", "Ness", 
-         "Olimar", "Pacman", "Palutena", "Peach", "Pichu", "Pikachu", "Piranha Plant", "Pit", 
-         "Pokemon Trainer", "Richter Belmont", "Ridley", "ROB", "Robin", "Rosalina & Luma", "Roy", "Ryu",  
-         "Samus", "Sheik", "Shulk", "Simon Belmont", "Snake", "Sonic", "Toon Link", "Villager", "Wario", 'Wii Fit Trainer',
-         "Wolf", "Yoshi", "Young Link", "Zelda"]
-        # Vs. Other Fighter (Total)
+        fighter_names = s.select_list('SELECT * FROM Fighter', 0)
+
+        # Individual Stats
+        queries = ["SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter1, map.replace("'","''")),
+        "SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter2, map.replace("'","''")),
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        ''
+        ]
+        indy_widget_row = 7
+
+        try:
+            data_fighter_1 = s.select_view_row("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter1, map.replace("'","''")))
+            data_fighter_2 = s.select_view_row("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter2, map.replace("'","''")))
+            
+            self.tableWidget1.setItem(7,0,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][2])))
+            self.tableWidget1.setItem(7,1,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][3])))
+            self.tableWidget1.setItem(7,2,QtWidgets.QTableWidgetItem(data_fighter_1[0][4]))
+
+            self.tableWidget2.setItem(7,0,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][2])))
+            self.tableWidget2.setItem(7,1,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][3])))
+            self.tableWidget2.setItem(7,2,QtWidgets.QTableWidgetItem(data_fighter_2[0][4]))
+        except IndexError:
+            pass
+        
+        # Vs. Other Fighter (All Rows)
         stored_procedures = ["call SmashBros.headtohead('{}','{}');".format(fighter1, fighter2), 
         "call SmashBros.headtoheadLocation('{}','{}','{}');".format(fighter1, fighter2, map.replace("'","''")),
         "call SmashBros.headtoheadFightType('{}','{}','{}');".format(fighter1, fighter2, matchType),
@@ -600,20 +629,20 @@ class Ui_SmashUI(object):
         "call SmashBros.headtoheadMonth('{}','{}','{}');".format(fighter1, fighter2, month), 
         "call SmashBros.headtoheadChamp('{}','{}');".format(fighter1, fighter2), 
         "call SmashBros.headtoheadPPV('{}','{}','{}');".format(fighter1, fighter2, ppv)]
-        widget_row = 0
+        h2h_widget_row = 0
         if fighter1 and fighter2 != 'Enter Fighter':
             for stored_procedure in stored_procedures:
                 dataH2H = s.h2h_query_sql("{}".format(stored_procedure))
                 
-                self.tableWidget1.setItem(widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[0]['Wins']))
-                self.tableWidget1.setItem(widget_row,1,QtWidgets.QTableWidgetItem(dataH2H[0]['Losses']))
-                self.tableWidget1.setItem(widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[0]['W/L %']))
+                self.tableWidget1.setItem(h2h_widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[0]['Wins']))
+                self.tableWidget1.setItem(h2h_widget_row,1,QtWidgets.QTableWidgetItem(dataH2H[0]['Losses']))
+                self.tableWidget1.setItem(h2h_widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[0]['W/L %']))
 
-                self.tableWidget2.setItem(widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[1]['Wins']))
-                self.tableWidget2.setItem(widget_row,1,QtWidgets.QTableWidgetItem(dataH2H[1]['Losses']))
-                self.tableWidget2.setItem(widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[1]['W/L %']))
+                self.tableWidget2.setItem(h2h_widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[1]['Wins']))
+                self.tableWidget2.setItem(h2h_widget_row,1,QtWidgets.QTableWidgetItem(dataH2H[1]['Losses']))
+                self.tableWidget2.setItem(h2h_widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[1]['W/L %']))
                 self.ErrorTextBox.setText('')
-                widget_row += 1
+                h2h_widget_row += 1
         elif fighter1 or fighter2 == 'Enter Fighter':
             self.ErrorTextBox.setText('Enter Another Fighter!')
         elif fighter1 or fighter2 not in fighter_names:

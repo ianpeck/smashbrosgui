@@ -7,3 +7,4 @@
 - Fix Tab Colors
 - Check Stats Button connects with other SP to fill out rest of TableWidget
 - What if Completers only suggested things that fighters particpated in (certain maps specifically)
+- Should everthing be zero at the beginning? would that remove the need for multiple stored procedures?
