@@ -591,34 +591,59 @@ class Ui_SmashUI(object):
         # Individual Stats
         queries = ["SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter1, map.replace("'","''")),
         "SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter2, map.replace("'","''")),
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        ''
+        "SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = '{}' AND FightType = '{}'".format(fighter1, matchType),
+        "SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = '{}' AND FightType = '{}'".format(fighter2, matchType),
+        "SELECT * FROM champfightstats WHERE Fighter_Name = '{}'".format(fighter1),
+        "SELECT * FROM champfightstats WHERE Fighter_Name = '{}'".format(fighter2),
+        "SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = '{}' AND PPV = '{}'".format(fighter1, ppv),
+        "SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = '{}' AND PPV = '{}'".format(fighter2, ppv),
+        "SELECT * FROM defendingtitle WHERE Fighter_Name = '{}'".format(fighter1),
+        "SELECT * FROM defendingtitle WHERE Fighter_Name = '{}'".format(fighter2),
+        "SELECT * FROM careerstats WHERE Fighter_Name = '{}'".format(fighter1),
+        "SELECT * FROM careerstats WHERE Fighter_Name = '{}'".format(fighter2),
+        "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter1, season),
+        "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter2, season)
         ]
-        indy_widget_row = 7
 
-        try:
-            data_fighter_1 = s.select_view_row("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter1, map.replace("'","''")))
-            data_fighter_2 = s.select_view_row("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter2, map.replace("'","''")))
-            
-            self.tableWidget1.setItem(7,0,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][2])))
-            self.tableWidget1.setItem(7,1,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][3])))
-            self.tableWidget1.setItem(7,2,QtWidgets.QTableWidgetItem(data_fighter_1[0][4]))
+        indy_widget_row_fighter_1 = 7
+        indy_widget_row_fighter_2 = 7
 
-            self.tableWidget2.setItem(7,0,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][2])))
-            self.tableWidget2.setItem(7,1,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][3])))
-            self.tableWidget2.setItem(7,2,QtWidgets.QTableWidgetItem(data_fighter_2[0][4]))
-        except IndexError:
-            pass
+        for i, query in enumerate(queries):
+
+
+            if i % 2 == 0:
+
+                try:
+
+                    data_fighter_1 = s.select_view_row(query)
+
+                    
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1,0,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][-3])))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1,1,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][-2])))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1,2,QtWidgets.QTableWidgetItem(data_fighter_1[0][-1]))
+                    indy_widget_row_fighter_1 += 1
+                    
+                except IndexError:
+                    indy_widget_row_fighter_1 += 1
+                    pass
+                    
+
+
+            else:
+
+                try:
+
+                    data_fighter_2 = s.select_view_row(query)
+
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2,0,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][-3])))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2,1,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][-2])))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2,2,QtWidgets.QTableWidgetItem(data_fighter_2[0][-1]))
+                    indy_widget_row_fighter_2 += 1
+                    
+                except IndexError:
+                    indy_widget_row_fighter_2 += 1
+                    pass
+
         
         # Vs. Other Fighter (All Rows)
         stored_procedures = ["call SmashBros.headtohead('{}','{}');".format(fighter1, fighter2), 
