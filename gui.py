@@ -401,6 +401,13 @@ class Ui_SmashUI(object):
         self.CheckStatsButton.setGeometry(QtCore.QRect(650, 610, 131, 41))
         self.CheckStatsButton.setObjectName("CheckStatsButton")
         self.CheckStatsButton.clicked.connect(self.checkStats)
+        
+         # Clear Button
+        self.ClearButton = QtWidgets.QPushButton(self.HeadToHeadtab)
+        self.ClearButton.setGeometry(QtCore.QRect(650, 710, 131, 41))
+        self.ClearButton.setObjectName("ClearButton")
+        self.ClearButton.clicked.connect(self.clear)
+
 
         # Fighter Table 1
         self.tableWidget1 = QtWidgets.QTableWidget(self.HeadToHeadtab)
@@ -445,6 +452,14 @@ class Ui_SmashUI(object):
         self.tableWidget1.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget1.setHorizontalHeaderItem(2, item)
+
+        for row in range(0,15):
+            self.tableWidget1.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget1.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget1.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
+            self.tableWidget2.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget2.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget2.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
         
         # More Tabs
         self.tabWidget.addTab(self.HeadToHeadtab, "")
@@ -523,6 +538,7 @@ class Ui_SmashUI(object):
         self.BrandTextBox.setText(_translate("SmashUI", "Enter Brand"))
         self.label_9.setText(_translate("SmashUI", "Brand:"))
         self.CheckStatsButton.setText(_translate("SmashUI", "Check Stats"))
+        self.ClearButton.setText(_translate("SmashUI","Clear"))
         self.ErrorTextBox.setText(_translate("SmashUI", ""))
         self.label_10.setText(_translate("SmashUI", "Error:"))
         item = self.tableWidget1.verticalHeaderItem(0)
@@ -565,6 +581,36 @@ class Ui_SmashUI(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.LoadDataTab), _translate("SmashUI", "Load Data"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AdvancedStatsTab), _translate("SmashUI", "Advanced Fighter Stats"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.GraphTab), _translate("SmashUI", "Graphs"))
+
+    def clear(self):
+        self.FighterTextBox2.setText("Enter Fighter")
+        self.FighterTextBox1.setText("Enter Fighter")
+        self.MapTextBox.setText("Enter Map")
+        self.SeasonTextBox.setText("Enter Season")
+        self.MatchTextBox.setText("Enter Match Type")
+        self.MonthTextBox.setText("Enter Month Number")
+
+        self.label_5.setText("Week:")
+        self.PPVTextBox.setText("Enter PPV Name")
+        self.label_6.setText("PPV:")
+        self.ChampTextBox.setText("Enter Championship")
+        self.label_7.setText("Champ:")
+        self.ContenderTextBox.setText("#1 Contender Match?")
+        self.label_8.setText("#1con:")
+        self.BrandTextBox.setText("Enter Brand")
+
+        self.image1.setPixmap(QtGui.QPixmap(""))
+        self.image2.setPixmap(QtGui.QPixmap(""))
+        self.imageStage.setPixmap(QtGui.QPixmap(""))
+
+        for row in range(0,15):
+            self.tableWidget1.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget1.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget1.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
+            self.tableWidget2.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget2.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
+            self.tableWidget2.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
+
 
     def checkStats(self):
         # Change Pictures
