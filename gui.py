@@ -645,7 +645,7 @@ class Ui_SmashUI(object):
         "SELECT * FROM careerstats WHERE Fighter_Name = '{}'".format(fighter2),
         "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter1, season),
         "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter2, season),
-        "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter2, brand),
+        "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter1, brand),
         "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter2, brand)]
 
         indy_widget_row_fighter_1 = 7
@@ -667,6 +667,9 @@ class Ui_SmashUI(object):
                     indy_widget_row_fighter_1 += 1
                     
                 except IndexError:
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1,0,QtWidgets.QTableWidgetItem('0'))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1,1,QtWidgets.QTableWidgetItem('0'))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1,2,QtWidgets.QTableWidgetItem('0.00%'))
                     indy_widget_row_fighter_1 += 1
                     pass
                     
@@ -684,6 +687,9 @@ class Ui_SmashUI(object):
                     indy_widget_row_fighter_2 += 1
                     
                 except IndexError:
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2,0,QtWidgets.QTableWidgetItem('0'))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2,1,QtWidgets.QTableWidgetItem('0'))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2,2,QtWidgets.QTableWidgetItem('0.00%'))
                     indy_widget_row_fighter_2 += 1
                     pass
 
