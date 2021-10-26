@@ -364,10 +364,16 @@ class Ui_SmashUI(object):
         self.label_8.setAlignment(QtCore.Qt.AlignCenter)
         self.label_8.setObjectName("label_8")
 
+        brand_list = s.select_list('SELECT * FROM Brand', 1)
+        brand_list_completer = QtWidgets.QCompleter(brand_list)
+        brand_list_completer.setCaseSensitivity(0)
+        brand_list_completer.setCompletionMode(1)
+
         self.BrandTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
         self.BrandTextBox.setGeometry(QtCore.QRect(630, 570, 171, 22))
         self.BrandTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.BrandTextBox.setObjectName("BrandTextBox")
+        self.BrandTextBox.setCompleter(brand_list_completer)
 
 
         self.label_9 = QtWidgets.QLabel(self.HeadToHeadtab)
@@ -500,7 +506,7 @@ class Ui_SmashUI(object):
         item = self.tableWidget2.verticalHeaderItem(13)
         item.setText(_translate("SmashUI", "Season Record"))
         item = self.tableWidget2.verticalHeaderItem(14)
-        item.setText(_translate("SmashUI", "This Month so far"))
+        item.setText(_translate("SmashUI", "On Brand"))
         item = self.tableWidget2.horizontalHeaderItem(0)
         item.setText(_translate("SmashUI", "Wins"))
         item = self.tableWidget2.horizontalHeaderItem(1)
@@ -560,7 +566,7 @@ class Ui_SmashUI(object):
         item = self.tableWidget1.verticalHeaderItem(13)
         item.setText(_translate("SmashUI", "Season Record"))
         item = self.tableWidget1.verticalHeaderItem(14)
-        item.setText(_translate("SmashUI", "This Month so far"))
+        item.setText(_translate("SmashUI", "On Brand"))
         item = self.tableWidget1.horizontalHeaderItem(0)
         item.setText(_translate("SmashUI", "Wins"))
         item = self.tableWidget1.horizontalHeaderItem(1)
@@ -638,8 +644,9 @@ class Ui_SmashUI(object):
         "SELECT * FROM careerstats WHERE Fighter_Name = '{}'".format(fighter1),
         "SELECT * FROM careerstats WHERE Fighter_Name = '{}'".format(fighter2),
         "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter1, season),
-        "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter2, season)
-        ]
+        "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter2, season),
+        "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter2, brand),
+        "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter2, brand)]
 
         indy_widget_row_fighter_1 = 7
         indy_widget_row_fighter_2 = 7
