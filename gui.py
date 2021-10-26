@@ -585,14 +585,10 @@ class Ui_SmashUI(object):
         self.SeasonTextBox.setText("Enter Season")
         self.MatchTextBox.setText("Enter Match Type")
         self.MonthTextBox.setText("Enter Month Number")
-
-        self.label_5.setText("Week:")
+        self.WeekTextBox.setText("Enter Week")
         self.PPVTextBox.setText("Enter PPV Name")
-        self.label_6.setText("PPV:")
         self.ChampTextBox.setText("Enter Championship")
-        self.label_7.setText("Champ:")
         self.ContenderTextBox.setText("#1 Contender Match?")
-        self.label_8.setText("#1con:")
         self.BrandTextBox.setText("Enter Brand")
 
         self.image1.setPixmap(QtGui.QPixmap(""))
