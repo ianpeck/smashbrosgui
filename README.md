@@ -9,3 +9,4 @@ For now, it simply displays basic win-loss data based on different criteria (W/L
 This repos code is available for you to download but will not work unless your IP is granted access to my database. Until I add SQL string injection protection into the GUI, no additional IP's will be added to the security group.
 
 ![alt text](https://i.imgur.com/praoCaG.png?1)
+![vide](https://i.imgur.com/tuWUETP.mp4)
