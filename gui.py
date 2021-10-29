@@ -23,7 +23,7 @@ class Ui_SmashUI(object):
         # Fighter Table 2
 
         self.tableWidget2 = QtWidgets.QTableWidget(self.HeadToHeadtab)
-        self.tableWidget2.setGeometry(QtCore.QRect(860, 290, 531, 511))
+        self.tableWidget2.setGeometry(QtCore.QRect(860, 280, 531, 511))
         self.tableWidget2.setShowGrid(True)
         self.tableWidget2.setObjectName("tableWidget2")
         self.tableWidget2.setColumnCount(3)
@@ -264,7 +264,7 @@ class Ui_SmashUI(object):
 
         # Fighter Table 1
         self.tableWidget1 = QtWidgets.QTableWidget(self.HeadToHeadtab)
-        self.tableWidget1.setGeometry(QtCore.QRect(30, 290, 531, 511))
+        self.tableWidget1.setGeometry(QtCore.QRect(30, 280, 531, 511))
         self.tableWidget1.setShowGrid(True)
         self.tableWidget1.setObjectName("tableWidget1")
         self.tableWidget1.setColumnCount(3)
