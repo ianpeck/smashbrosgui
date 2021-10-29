@@ -1,6 +1,6 @@
 - GUI 
     + that inserts data to db as ETL
-    + Query performance (one big view will solve?)
+    + Query performance (one big view will solve?) variable[:]
 - Graphing data
     + Ethan will try some stuff for this
 - Advanced Stats Tab
