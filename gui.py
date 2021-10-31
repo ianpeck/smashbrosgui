@@ -1,10 +1,12 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+import pyqtgraph
+import numpy
 import sql as s
 
 
 class Ui_SmashUI(object):
     def setupUi(self, SmashUI):
-        # Tab Widget
+        # Tab Widget Setup / Initialize Theme
 
         self.tabWidget = QtWidgets.QTabWidget(SmashUI)
         self.tabWidget.setGeometry(QtCore.QRect(0, 0, 1431, 901))
@@ -19,6 +21,7 @@ class Ui_SmashUI(object):
 
         self.HeadToHeadtab = QtWidgets.QWidget()
         self.HeadToHeadtab.setObjectName("HeadToHeadtab")
+        self.tabWidget.addTab(self.HeadToHeadtab, "")
 
         # Fighter Table 2
 
@@ -66,8 +69,6 @@ class Ui_SmashUI(object):
         self.tableWidget2.setHorizontalHeaderItem(2, item)
 
         # Fighter Pictures and Text Boxes
-
-        # Auto Complete Options  
                                             
         fighter_names = s.select_list("SELECT * FROM Fighter", 0)
 
@@ -105,7 +106,7 @@ class Ui_SmashUI(object):
         self.FighterTextBox2.setObjectName("FighterTextBox2")
         self.FighterTextBox2.setCompleter(fighter_name_completer)
 
-        # Stage Image and Text Box
+        # Stage Images and Text Boxes
 
         location_list = s.select_list('SELECT * FROM Location', 1)
         location_list_completer = QtWidgets.QCompleter(location_list)
@@ -230,7 +231,6 @@ class Ui_SmashUI(object):
         self.BrandTextBox.setObjectName("BrandTextBox")
         self.BrandTextBox.setCompleter(brand_list_completer)
 
-
         self.label_9 = QtWidgets.QLabel(self.HeadToHeadtab)
         self.label_9.setGeometry(QtCore.QRect(570, 570, 60, 16))
         self.label_9.setAlignment(QtCore.Qt.AlignCenter)
@@ -240,7 +240,6 @@ class Ui_SmashUI(object):
         self.ErrorTextBox.setGeometry(QtCore.QRect(630, 670, 171, 22))
         self.ErrorTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.ErrorTextBox.setObjectName("ErrorTextBox")
-
 
         self.label_10 = QtWidgets.QLabel(self.HeadToHeadtab)
         self.label_10.setGeometry(QtCore.QRect(570, 670, 60, 16))
@@ -306,6 +305,8 @@ class Ui_SmashUI(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget1.setHorizontalHeaderItem(2, item)
 
+        # Set Tables with Default Values
+
         for row in range(0,15):
             self.tableWidget1.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
             self.tableWidget1.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
@@ -314,14 +315,17 @@ class Ui_SmashUI(object):
             self.tableWidget2.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
             self.tableWidget2.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
         
-        # More Tabs
-        self.tabWidget.addTab(self.HeadToHeadtab, "")
+        # Load Data (ETL) Tab
         self.LoadDataTab = QtWidgets.QWidget()
         self.LoadDataTab.setObjectName("LoadDataTab")
         self.tabWidget.addTab(self.LoadDataTab, "")
+
+        # Advanced Stats Tab
         self.AdvancedStatsTab = QtWidgets.QWidget()
         self.AdvancedStatsTab.setObjectName("AdvancedStatsTab")
         self.tabWidget.addTab(self.AdvancedStatsTab, "")
+
+        # Graphs Tab
         self.GraphTab = QtWidgets.QWidget()
         self.GraphTab.setObjectName("GraphTab")
         self.tabWidget.addTab(self.GraphTab, "")
