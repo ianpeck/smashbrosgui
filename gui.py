@@ -487,7 +487,7 @@ class Ui_SmashUI(object):
         dataH2H = []
         fighter_names = s.select_list('SELECT * FROM Fighter', 0)
 
-        # Individual Stats
+        # Individual Stats Queries
         queries = ["SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter1, map.replace("'","''")),
         "SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter2, map.replace("'","''")),
         "SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = '{}' AND FightType = '{}'".format(fighter1, matchType),
