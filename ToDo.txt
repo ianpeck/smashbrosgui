@@ -7,4 +7,3 @@
     + Intricate data about fighter 
     + Data about Entire Brands
     + Etc.
-- Update Pip Freeze
