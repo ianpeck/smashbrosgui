@@ -8,6 +8,13 @@ For now, it simply displays basic win-loss data based on different criteria (W/L
 
 This repos code is available for you to download but will not work unless your IP is granted SELECT access to my database. Please reach out to me at ianpeck22@gmail.com with your IP and I will add you to it.
 
+To use:
+1. clone the repo
+2. activate the virtualenv with source bin/activate
+3. pip install -r /path/to/requirements.txt
+4. reach out to me for select access on my database
+5. run gui.py to use
+
 ![alt text](https://i.imgur.com/praoCaG.png?1)
 
 
