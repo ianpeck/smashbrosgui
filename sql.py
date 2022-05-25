@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # ========= Env Variables =========
-dotenv_path = Path('/Users/ianjpeck/Documents/GitHub/smashbrosgui/secrets.env')
+dotenv_path = Path('secrets.env')
 load_dotenv(dotenv_path=dotenv_path)
 
 # ========= Variables =========

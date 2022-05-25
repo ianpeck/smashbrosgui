@@ -5,6 +5,7 @@ import sql as s
 
 
 class Ui_SmashUI(object):
+# Sets up the UI layout (used Qt Designer to set up layout)
     def setupUi(self, SmashUI):
         # Tab Widget Setup / Initialize Theme
 
@@ -71,7 +72,7 @@ class Ui_SmashUI(object):
         # Fighter Pictures and Text Boxes
                                             
         fighter_names = s.select_list("SELECT * FROM Fighter", 0)
-
+        # Auto Complete for Fighter Names
         fighter_name_completer = QtWidgets.QCompleter(fighter_names)
         fighter_name_completer.setCaseSensitivity(0)
         fighter_name_completer.setCompletionMode(2)
@@ -335,6 +336,7 @@ class Ui_SmashUI(object):
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(SmashUI)
 
+# Labels the UI
     def retranslateUi(self, SmashUI):
         _translate = QtCore.QCoreApplication.translate
         SmashUI.setWindowTitle(_translate("SmashUI", "Super Smash Bros"))
@@ -439,7 +441,10 @@ class Ui_SmashUI(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AdvancedStatsTab), _translate("SmashUI", "Advanced Fighter Stats"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.GraphTab), _translate("SmashUI", "Graphs"))
 
+# Clear Button in UI
+
     def clear(self):
+        # When you click clear, set GUI back to intial state; this 
         self.FighterTextBox2.setText("Enter Fighter")
         self.FighterTextBox1.setText("Enter Fighter")
         self.MapTextBox.setText("Enter Map")
@@ -464,9 +469,10 @@ class Ui_SmashUI(object):
             self.tableWidget2.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
             self.tableWidget2.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
 
+# Check Stats Button in UI
 
     def checkStats(self):
-        # Change Pictures
+        # Change Pictures based on input in the fighter/stage text box
         self.image1.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox1.text().lower().replace(' ', '').replace('.','').replace('&', 'and'))))
         self.image2.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox2.text().lower().replace(' ', '').replace('.','').replace('&','and'))))
         self.imageStage.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/stagepictures/{}.png".format(self.MapTextBox.text().lower().replace(' ','').replace(',','').replace("'",'').replace('(','').replace(')','').replace('-',''))))
