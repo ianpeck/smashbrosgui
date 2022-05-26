@@ -67,3 +67,4 @@ def select_view_row(query):
 # Output for Viewing
 print(select_view_row("SELECT * FROM careerstats WHERE Fighter_Name = 'Mario'"))
 print(h2h_query_sql("call SmashBros.headtohead('Mario','Luigi')"))
+print(select_list("SELECT * FROM Fighter",0))
