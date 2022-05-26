@@ -580,6 +580,7 @@ class Ui_SmashUI(object):
             for stored_procedure in stored_procedures:
                 dataH2H = s.h2h_query_sql("{}".format(stored_procedure))
                 
+                # Sets each data table box equal to the corresponding dictionary value returned in h2h_query_sql
                 self.tableWidget1.setItem(h2h_widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[0]['Wins']))
                 self.tableWidget1.setItem(h2h_widget_row,1,QtWidgets.QTableWidgetItem(dataH2H[0]['Losses']))
                 self.tableWidget1.setItem(h2h_widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[0]['W/L %']))
