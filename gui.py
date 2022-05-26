@@ -513,21 +513,25 @@ class Ui_SmashUI(object):
         "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter1, brand),
         "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter2, brand)]
 
+        # First Row of Individual Stats starts at 7
         indy_widget_row_fighter_1 = 7
         indy_widget_row_fighter_2 = 7
 
+        # Loops through our queries list and runs them, assigns the results to their correct spots in the GUI data table
         for i, query in enumerate(queries):
 
-
+        # Fighter 1's queries, if there is no Fighter 1, error will be caught and 0's will be assigned to Wins/Losses/Win %
             if i % 2 == 0:
 
                 try:
 
                     data_fighter_1 = s.select_view_row(query)
 
-                    
+                    # Wins
                     self.tableWidget1.setItem(indy_widget_row_fighter_1,0,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][-3])))
+                    # Losses
                     self.tableWidget1.setItem(indy_widget_row_fighter_1,1,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][-2])))
+                    # Win Percentage
                     self.tableWidget1.setItem(indy_widget_row_fighter_1,2,QtWidgets.QTableWidgetItem(data_fighter_1[0][-1]))
                     indy_widget_row_fighter_1 += 1
                     
@@ -567,7 +571,11 @@ class Ui_SmashUI(object):
         "call SmashBros.headtoheadMonth('{}','{}','{}');".format(fighter1, fighter2, month), 
         "call SmashBros.headtoheadChamp('{}','{}');".format(fighter1, fighter2), 
         "call SmashBros.headtoheadPPV('{}','{}','{}');".format(fighter1, fighter2, ppv)]
+
+        # Row Number starts at 0 since H2H stats are at the top of the data table in the GUI
         h2h_widget_row = 0
+
+        # Only attempts to run this if both text boxes are not equal to the original text the GUI assigns originally to the text box
         if fighter1 and fighter2 != 'Enter Fighter':
             for stored_procedure in stored_procedures:
                 dataH2H = s.h2h_query_sql("{}".format(stored_procedure))

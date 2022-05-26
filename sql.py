@@ -63,3 +63,6 @@ def select_view_row(query):
         for row in data:
             dataList.append(row)
         return dataList
+
+# Output for Viewing
+print(select_view_row("SELECT * FROM careerstats WHERE Fighter_Name = 'Mario'"))
