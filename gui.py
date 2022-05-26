@@ -444,7 +444,7 @@ class Ui_SmashUI(object):
 # Clear Button in UI
 
     def clear(self):
-        # When you click clear, set GUI back to intial state; this 
+        # When you click clear, set GUI back to intial state. 
         self.FighterTextBox2.setText("Enter Fighter")
         self.FighterTextBox1.setText("Enter Fighter")
         self.MapTextBox.setText("Enter Map")
@@ -457,10 +457,12 @@ class Ui_SmashUI(object):
         self.ContenderTextBox.setText("#1 Contender Match?")
         self.BrandTextBox.setText("Enter Brand")
 
+        # Empty pictures
         self.image1.setPixmap(QtGui.QPixmap(""))
         self.image2.setPixmap(QtGui.QPixmap(""))
         self.imageStage.setPixmap(QtGui.QPixmap(""))
 
+        # Change all numbers in data table to 0 or 0%
         for row in range(0,15):
             self.tableWidget1.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
             self.tableWidget1.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
