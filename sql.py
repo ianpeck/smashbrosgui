@@ -16,6 +16,7 @@ region = "us-east-2a"
 dbname = os.environ.get('awsdb')
 
 # ========= Functions =========
+# Selects a list of dicts of information from a duo of fighters
 def h2h_query_sql(query):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
@@ -42,6 +43,7 @@ def h2h_query_sql(query):
                 fighter2_dict['W/L %'] = data
         return [fighter1_dict, fighter2_dict]
 
+# Creates a list of values found in a column
 def select_list(query, columnnumber):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
@@ -53,6 +55,7 @@ def select_list(query, columnnumber):
             dataList.append(row[columnnumber])
         return dataList
 
+# Selects row(s) from a table, a tuple or tuples inside of a list
 def select_view_row(query):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
