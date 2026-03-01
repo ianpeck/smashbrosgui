@@ -1,7 +1,90 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from concurrent.futures import ThreadPoolExecutor
 import pyqtgraph
 import numpy
 import sql as s
+import os
+
+
+# Worker thread for database queries
+class DatabaseWorker(QtCore.QThread):
+    # Signals to send data back to main thread
+    results_ready = QtCore.pyqtSignal(dict)
+    error_occurred = QtCore.pyqtSignal(str)
+
+    def __init__(self, fighter1, fighter2, map_name, matchType, season, month, week, ppv, championship, contender, brand):
+        super().__init__()
+        self.fighter1 = fighter1
+        self.fighter2 = fighter2
+        self.map_name = map_name
+        self.matchType = matchType
+        self.season = season
+        self.month = month
+        self.week = week
+        self.ppv = ppv
+        self.championship = championship
+        self.contender = contender
+        self.brand = brand
+
+    def run(self):
+        try:
+            results = {}
+
+            # Individual Stats Queries (query, params)
+            queries = [
+                ("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = %s AND Location_Name = %s", (self.fighter1, self.map_name)),
+                ("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = %s AND Location_Name = %s", (self.fighter2, self.map_name)),
+                ("SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = %s AND FightType = %s", (self.fighter1, self.matchType)),
+                ("SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = %s AND FightType = %s", (self.fighter2, self.matchType)),
+                ("SELECT * FROM champfightstats WHERE Fighter_Name = %s", (self.fighter1,)),
+                ("SELECT * FROM champfightstats WHERE Fighter_Name = %s", (self.fighter2,)),
+                ("SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = %s AND PPV = %s", (self.fighter1, self.ppv)),
+                ("SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = %s AND PPV = %s", (self.fighter2, self.ppv)),
+                ("SELECT * FROM defendingtitle WHERE Fighter_Name = %s", (self.fighter1,)),
+                ("SELECT * FROM defendingtitle WHERE Fighter_Name = %s", (self.fighter2,)),
+                ("SELECT * FROM careerstats WHERE Fighter_Name = %s", (self.fighter1,)),
+                ("SELECT * FROM careerstats WHERE Fighter_Name = %s", (self.fighter2,)),
+                ("SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = %s AND Season = %s", (self.fighter1, self.season)),
+                ("SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = %s AND Season = %s", (self.fighter2, self.season)),
+                ("SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = %s AND Brand = %s", (self.fighter1, self.brand)),
+                ("SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = %s AND Brand = %s", (self.fighter2, self.brand))
+            ]
+
+            # Head-to-head queries
+            stored_procedures = [
+                ("call SmashBros.headtohead(%s, %s)", (self.fighter1, self.fighter2)),
+                ("call SmashBros.headtoheadLocation(%s, %s, %s)", (self.fighter1, self.fighter2, self.map_name)),
+                ("call SmashBros.headtoheadFightType(%s, %s, %s)", (self.fighter1, self.fighter2, self.matchType)),
+                ("call SmashBros.headtoheadSeason(%s, %s, %s)", (self.fighter1, self.fighter2, self.season)),
+                ("call SmashBros.headtoheadMonth(%s, %s, %s)", (self.fighter1, self.fighter2, self.month)),
+                ("call SmashBros.headtoheadChamp(%s, %s)", (self.fighter1, self.fighter2)),
+                ("call SmashBros.headtoheadPPV(%s, %s, %s)", (self.fighter1, self.fighter2, self.ppv))
+            ]
+
+            # Fire all 23 queries in parallel -- each gets its own connection
+            def run_individual(query_params):
+                query, params = query_params
+                try:
+                    return s.select_view_row(query, params)
+                except IndexError:
+                    return None
+
+            def run_h2h(proc_params):
+                proc, params = proc_params
+                return s.h2h_query_sql(proc, params)
+
+            with ThreadPoolExecutor(max_workers=23) as pool:
+                individual_futures = list(pool.map(run_individual, queries))
+                h2h_futures = list(pool.map(run_h2h, stored_procedures))
+
+            results['individual'] = individual_futures
+            results['h2h'] = h2h_futures
+
+            # Send results back to main thread
+            self.results_ready.emit(results)
+
+        except Exception as e:
+            self.error_occurred.emit(str(e))
 
 
 class Ui_SmashUI(object):
@@ -10,11 +93,11 @@ class Ui_SmashUI(object):
         # Tab Widget Setup / Initialize Theme
 
         self.tabWidget = QtWidgets.QTabWidget(SmashUI)
-        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 1431, 901))
+        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 1860, 1171))
         self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tabWidget.setElideMode(QtCore.Qt.ElideNone)
         self.tabWidget.setObjectName("tabWidget")
-        with open('theme/darkeum.qss', 'r', encoding='utf-8') as file:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'theme', 'darkeum.qss'), 'r', encoding='utf-8') as file:
             theme_content = file.read()
         self.tabWidget.setStyleSheet(theme_content)
 
@@ -27,7 +110,7 @@ class Ui_SmashUI(object):
         # Fighter Table 2
 
         self.tableWidget2 = QtWidgets.QTableWidget(self.HeadToHeadtab)
-        self.tableWidget2.setGeometry(QtCore.QRect(860, 280, 531, 511))
+        self.tableWidget2.setGeometry(QtCore.QRect(1118, 364, 690, 664))
         self.tableWidget2.setShowGrid(True)
         self.tableWidget2.setObjectName("tableWidget2")
         self.tableWidget2.setColumnCount(3)
@@ -79,7 +162,7 @@ class Ui_SmashUI(object):
         
 
         self.image1 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.image1.setGeometry(QtCore.QRect(210, 10, 221, 231))
+        self.image1.setGeometry(QtCore.QRect(273, 13, 287, 300))
         self.image1.setToolTipDuration(0)
         self.image1.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.image1.setText("")
@@ -87,13 +170,13 @@ class Ui_SmashUI(object):
         self.image1.setObjectName("image1")
 
         self.FighterTextBox1 = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.FighterTextBox1.setGeometry(QtCore.QRect(240, 250, 161, 22))
+        self.FighterTextBox1.setGeometry(QtCore.QRect(312, 325, 209, 28))
         self.FighterTextBox1.setAlignment(QtCore.Qt.AlignCenter)
         self.FighterTextBox1.setObjectName("FighterTextBox1")
         self.FighterTextBox1.setCompleter(fighter_name_completer)
 
         self.image2 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.image2.setGeometry(QtCore.QRect(1010, 10, 221, 231))
+        self.image2.setGeometry(QtCore.QRect(1313, 13, 287, 300))
         self.image2.setStyleSheet("")
         self.image2.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.image2.setText("")
@@ -101,7 +184,7 @@ class Ui_SmashUI(object):
         self.image2.setObjectName("image2")
 
         self.FighterTextBox2 = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.FighterTextBox2.setGeometry(QtCore.QRect(1040, 250, 161, 22))
+        self.FighterTextBox2.setGeometry(QtCore.QRect(1352, 325, 209, 28))
         self.FighterTextBox2.setFrame(True)
         self.FighterTextBox2.setAlignment(QtCore.Qt.AlignCenter)
         self.FighterTextBox2.setObjectName("FighterTextBox2")
@@ -114,13 +197,13 @@ class Ui_SmashUI(object):
         location_list_completer.setCaseSensitivity(0)
 
         self.MapTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.MapTextBox.setGeometry(QtCore.QRect(630, 250, 171, 22))
+        self.MapTextBox.setGeometry(QtCore.QRect(819, 325, 222, 28))
         self.MapTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.MapTextBox.setObjectName("MapTextBox")
         self.MapTextBox.setCompleter(location_list_completer)
 
         self.imageStage = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.imageStage.setGeometry(QtCore.QRect(490, 10, 451, 231))
+        self.imageStage.setGeometry(QtCore.QRect(637, 13, 586, 300))
         self.imageStage.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.imageStage.setText("")
         self.imageStage.setScaledContents(True)
@@ -129,17 +212,17 @@ class Ui_SmashUI(object):
         # Labels and Data Text Boxes
 
         self.label = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label.setGeometry(QtCore.QRect(570, 250, 60, 16))
+        self.label.setGeometry(QtCore.QRect(741, 325, 78, 20))
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
 
         self.label_2 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_2.setGeometry(QtCore.QRect(570, 290, 60, 16))
+        self.label_2.setGeometry(QtCore.QRect(741, 377, 78, 20))
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
 
         self.label_3 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_3.setGeometry(QtCore.QRect(570, 330, 60, 16))
+        self.label_3.setGeometry(QtCore.QRect(741, 429, 78, 20))
         self.label_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_3.setObjectName("label_3")
 
@@ -149,33 +232,33 @@ class Ui_SmashUI(object):
         fightType_list_completer.setCompletionMode(1)
 
         self.MatchTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.MatchTextBox.setGeometry(QtCore.QRect(630, 290, 171, 22))
+        self.MatchTextBox.setGeometry(QtCore.QRect(819, 377, 222, 28))
         self.MatchTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.MatchTextBox.setObjectName("MatchTextBox")
         self.MatchTextBox.setCompleter(fightType_list_completer)
 
         self.SeasonTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.SeasonTextBox.setGeometry(QtCore.QRect(630, 330, 171, 22))
+        self.SeasonTextBox.setGeometry(QtCore.QRect(819, 429, 222, 28))
         self.SeasonTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.SeasonTextBox.setObjectName("SeasonTextBox")
 
         self.MonthTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.MonthTextBox.setGeometry(QtCore.QRect(630, 370, 171, 22))
+        self.MonthTextBox.setGeometry(QtCore.QRect(819, 481, 222, 28))
         self.MonthTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.MonthTextBox.setObjectName("MonthTextBox")
 
         self.label_4 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_4.setGeometry(QtCore.QRect(570, 370, 60, 16))
+        self.label_4.setGeometry(QtCore.QRect(741, 481, 78, 20))
         self.label_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_4.setObjectName("label_4")
 
         self.WeekTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.WeekTextBox.setGeometry(QtCore.QRect(630, 410, 171, 22))
+        self.WeekTextBox.setGeometry(QtCore.QRect(819, 533, 222, 28))
         self.WeekTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.WeekTextBox.setObjectName("WeekTextBox")
 
         self.label_5 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_5.setGeometry(QtCore.QRect(570, 410, 60, 16))
+        self.label_5.setGeometry(QtCore.QRect(741, 533, 78, 20))
         self.label_5.setAlignment(QtCore.Qt.AlignCenter)
         self.label_5.setObjectName("label_5")
 
@@ -185,13 +268,13 @@ class Ui_SmashUI(object):
         ppv_list_completer.setCompletionMode(1)
 
         self.PPVTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.PPVTextBox.setGeometry(QtCore.QRect(630, 450, 171, 22))
+        self.PPVTextBox.setGeometry(QtCore.QRect(819, 585, 222, 28))
         self.PPVTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.PPVTextBox.setObjectName("PPVTextBox")
         self.PPVTextBox.setCompleter(ppv_list_completer)
 
         self.label_6 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_6.setGeometry(QtCore.QRect(570, 450, 60, 16))
+        self.label_6.setGeometry(QtCore.QRect(741, 585, 78, 20))
         self.label_6.setAlignment(QtCore.Qt.AlignCenter)
         self.label_6.setObjectName("label_6")
 
@@ -201,23 +284,23 @@ class Ui_SmashUI(object):
         champ_list_completer.setCompletionMode(1)
 
         self.ChampTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.ChampTextBox.setGeometry(QtCore.QRect(630, 490, 171, 22))
+        self.ChampTextBox.setGeometry(QtCore.QRect(819, 637, 222, 28))
         self.ChampTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.ChampTextBox.setObjectName("ChampTextBox")
         self.ChampTextBox.setCompleter(champ_list_completer)
 
         self.label_7 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_7.setGeometry(QtCore.QRect(570, 490, 60, 16))
+        self.label_7.setGeometry(QtCore.QRect(741, 637, 78, 20))
         self.label_7.setAlignment(QtCore.Qt.AlignCenter)
         self.label_7.setObjectName("label_7")
 
         self.ContenderTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.ContenderTextBox.setGeometry(QtCore.QRect(630, 530, 171, 22))
+        self.ContenderTextBox.setGeometry(QtCore.QRect(819, 689, 222, 28))
         self.ContenderTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.ContenderTextBox.setObjectName("ContenderTextBox")
 
         self.label_8 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_8.setGeometry(QtCore.QRect(570, 530, 60, 16))
+        self.label_8.setGeometry(QtCore.QRect(741, 689, 78, 20))
         self.label_8.setAlignment(QtCore.Qt.AlignCenter)
         self.label_8.setObjectName("label_8")
 
@@ -227,36 +310,36 @@ class Ui_SmashUI(object):
         brand_list_completer.setCompletionMode(1)
 
         self.BrandTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.BrandTextBox.setGeometry(QtCore.QRect(630, 570, 171, 22))
+        self.BrandTextBox.setGeometry(QtCore.QRect(819, 741, 222, 28))
         self.BrandTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.BrandTextBox.setObjectName("BrandTextBox")
         self.BrandTextBox.setCompleter(brand_list_completer)
 
         self.label_9 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_9.setGeometry(QtCore.QRect(570, 570, 60, 16))
+        self.label_9.setGeometry(QtCore.QRect(741, 741, 78, 20))
         self.label_9.setAlignment(QtCore.Qt.AlignCenter)
         self.label_9.setObjectName("label_9")
 
         self.ErrorTextBox = QtWidgets.QLineEdit(self.HeadToHeadtab)
-        self.ErrorTextBox.setGeometry(QtCore.QRect(630, 670, 171, 22))
+        self.ErrorTextBox.setGeometry(QtCore.QRect(819, 871, 222, 28))
         self.ErrorTextBox.setAlignment(QtCore.Qt.AlignCenter)
         self.ErrorTextBox.setObjectName("ErrorTextBox")
 
         self.label_10 = QtWidgets.QLabel(self.HeadToHeadtab)
-        self.label_10.setGeometry(QtCore.QRect(570, 670, 60, 16))
+        self.label_10.setGeometry(QtCore.QRect(741, 871, 78, 20))
         self.label_10.setAlignment(QtCore.Qt.AlignCenter)
         self.label_10.setObjectName("label_10")
 
          # Check Stats Button
         self.CheckStatsButton = QtWidgets.QPushButton(self.HeadToHeadtab)
-        self.CheckStatsButton.setGeometry(QtCore.QRect(650, 610, 131, 41))
+        self.CheckStatsButton.setGeometry(QtCore.QRect(845, 793, 170, 53))
         self.CheckStatsButton.setObjectName("CheckStatsButton")
         self.CheckStatsButton.clicked.connect(self.checkStats)
         self.CheckStatsButton.setStyleSheet("background-color : gray")
         
          # Clear Button
         self.ClearButton = QtWidgets.QPushButton(self.HeadToHeadtab)
-        self.ClearButton.setGeometry(QtCore.QRect(650, 710, 131, 41))
+        self.ClearButton.setGeometry(QtCore.QRect(845, 923, 170, 53))
         self.ClearButton.setObjectName("ClearButton")
         self.ClearButton.clicked.connect(self.clear)
         self.ClearButton.setStyleSheet("background-color : gray")
@@ -264,7 +347,7 @@ class Ui_SmashUI(object):
 
         # Fighter Table 1
         self.tableWidget1 = QtWidgets.QTableWidget(self.HeadToHeadtab)
-        self.tableWidget1.setGeometry(QtCore.QRect(30, 280, 531, 511))
+        self.tableWidget1.setGeometry(QtCore.QRect(39, 364, 690, 664))
         self.tableWidget1.setShowGrid(True)
         self.tableWidget1.setObjectName("tableWidget1")
         self.tableWidget1.setColumnCount(3)
@@ -306,16 +389,20 @@ class Ui_SmashUI(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget1.setHorizontalHeaderItem(2, item)
 
+        # Wide row header for text labels, data columns stretch to fill the rest
+        for table in (self.tableWidget1, self.tableWidget2):
+            table.verticalHeader().setFixedWidth(400)
+            table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
         # Set Tables with Default Values
 
         for row in range(0,15):
-            self.tableWidget1.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget1.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget1.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
-            self.tableWidget2.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget2.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget2.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
-        
+            for table in (self.tableWidget1, self.tableWidget2):
+                for col, val in enumerate(['0', '0', '0.00%']):
+                    item = QtWidgets.QTableWidgetItem(val)
+                    item.setTextAlignment(QtCore.Qt.AlignCenter)
+                    table.setItem(row, col, item)
+
         # Load Data (ETL) Tab
         self.LoadDataTab = QtWidgets.QWidget()
         self.LoadDataTab.setObjectName("LoadDataTab")
@@ -464,25 +551,37 @@ class Ui_SmashUI(object):
 
         # Change all numbers in data table to 0 or 0%
         for row in range(0,15):
-            self.tableWidget1.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget1.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget1.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
-            self.tableWidget2.setItem(row,0,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget2.setItem(row,1,QtWidgets.QTableWidgetItem('0'))
-            self.tableWidget2.setItem(row,2,QtWidgets.QTableWidgetItem('0.00%'))
+            for table in (self.tableWidget1, self.tableWidget2):
+                for col, val in enumerate(['0', '0', '0.00%']):
+                    item = QtWidgets.QTableWidgetItem(val)
+                    item.setTextAlignment(QtCore.Qt.AlignCenter)
+                    table.setItem(row, col, item)
 
 # Check Stats Button in UI
 
     def checkStats(self):
+        # Show loading cursor
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+
+        # Disable button while loading
+        self.CheckStatsButton.setEnabled(False)
+        self.CheckStatsButton.setText("Loading...")
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
         # Change Pictures based on input in the fighter/stage text box
-        self.image1.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox1.text().lower().replace(' ', '').replace('.','').replace('&', 'and'))))
-        self.image2.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/fighterpictures/{}.png".format(self.FighterTextBox2.text().lower().replace(' ', '').replace('.','').replace('&','and'))))
-        self.imageStage.setPixmap(QtGui.QPixmap("/Users/ianjpeck/Documents/GitHub/smashbrosgui/stagepictures/{}.png".format(self.MapTextBox.text().lower().replace(' ','').replace(',','').replace("'",'').replace('(','').replace(')','').replace('-',''))))
+        fighter1_filename = self.FighterTextBox1.text().lower().replace(' ', '').replace('.','').replace('&', 'and')
+        fighter2_filename = self.FighterTextBox2.text().lower().replace(' ', '').replace('.','').replace('&','and')
+        stage_filename = self.MapTextBox.text().lower().replace(' ','').replace(',','').replace("'",'').replace('(','').replace(')','').replace('-','')
+
+        self.image1.setPixmap(QtGui.QPixmap(os.path.join(script_dir, 'assets', 'fighters', f'{fighter1_filename}.png')))
+        self.image2.setPixmap(QtGui.QPixmap(os.path.join(script_dir, 'assets', 'fighters', f'{fighter2_filename}.png')))
+        self.imageStage.setPixmap(QtGui.QPixmap(os.path.join(script_dir, 'assets', 'stages', f'{stage_filename}.png')))
         
         # Initialize Variables
         fighter1 = self.FighterTextBox1.text()
         fighter2 = self.FighterTextBox2.text()
-        map = self.MapTextBox.text()
+        map_name = self.MapTextBox.text()
         matchType = self.MatchTextBox.text()
         season = self.SeasonTextBox.text()
         month = self.MonthTextBox.text()
@@ -491,113 +590,79 @@ class Ui_SmashUI(object):
         championship = self.ChampTextBox.text()
         contender = self.ContenderTextBox.text()
         brand = self.BrandTextBox.text()
-        dataIndy = []
-        dataH2H = []
-        fighter_names = s.select_list('SELECT * FROM Fighter', 0)
 
-        # Individual Stats Queries (query, params)
-        queries = [
-            ("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = %s AND Location_Name = %s", (fighter1, map)),
-            ("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = %s AND Location_Name = %s", (fighter2, map)),
-            ("SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = %s AND FightType = %s", (fighter1, matchType)),
-            ("SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = %s AND FightType = %s", (fighter2, matchType)),
-            ("SELECT * FROM champfightstats WHERE Fighter_Name = %s", (fighter1,)),
-            ("SELECT * FROM champfightstats WHERE Fighter_Name = %s", (fighter2,)),
-            ("SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = %s AND PPV = %s", (fighter1, ppv)),
-            ("SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = %s AND PPV = %s", (fighter2, ppv)),
-            ("SELECT * FROM defendingtitle WHERE Fighter_Name = %s", (fighter1,)),
-            ("SELECT * FROM defendingtitle WHERE Fighter_Name = %s", (fighter2,)),
-            ("SELECT * FROM careerstats WHERE Fighter_Name = %s", (fighter1,)),
-            ("SELECT * FROM careerstats WHERE Fighter_Name = %s", (fighter2,)),
-            ("SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = %s AND Season = %s", (fighter1, season)),
-            ("SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = %s AND Season = %s", (fighter2, season)),
-            ("SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = %s AND Brand = %s", (fighter1, brand)),
-            ("SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = %s AND Brand = %s", (fighter2, brand))
-        ]
+        # Validate inputs
+        if fighter1 == 'Enter Fighter' or fighter2 == 'Enter Fighter':
+            self.ErrorTextBox.setText('Enter Another Fighter!')
+            QtWidgets.QApplication.restoreOverrideCursor()
+            self.CheckStatsButton.setEnabled(True)
+            self.CheckStatsButton.setText("Check Stats")
+            return
 
-        # First Row of Individual Stats starts at 7
+        # Create and start worker thread
+        self.worker = DatabaseWorker(fighter1, fighter2, map_name, matchType, season, month, week, ppv, championship, contender, brand)
+        self.worker.results_ready.connect(self.handle_results)
+        self.worker.error_occurred.connect(self.handle_error)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.worker.start()
+
+    def handle_error(self, error_msg):
+        self.ErrorTextBox.setText(f'Error: {error_msg}')
+        QtWidgets.QApplication.restoreOverrideCursor()
+        self.CheckStatsButton.setEnabled(True)
+        self.CheckStatsButton.setText("Check Stats")
+
+    def _centered_item(self, text):
+        item = QtWidgets.QTableWidgetItem(str(text))
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        return item
+
+    def handle_results(self, results):
+        # Process individual stats
         indy_widget_row_fighter_1 = 7
         indy_widget_row_fighter_2 = 7
 
-        # Loops through our queries list and runs them, assigns the results to their correct spots in the GUI data table
-        for i, (query, params) in enumerate(queries):
-
-        # Fighter 1's queries, if there is no Fighter 1, error will be caught and 0's will be assigned to Wins/Losses/Win %
+        for i, data in enumerate(results['individual']):
+            # Fighter 1's queries (even indices)
             if i % 2 == 0:
-
-                try:
-
-                    data_fighter_1 = s.select_view_row(query, params)
-
-                    # Wins
-                    self.tableWidget1.setItem(indy_widget_row_fighter_1,0,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][-3])))
-                    # Losses
-                    self.tableWidget1.setItem(indy_widget_row_fighter_1,1,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][-2])))
-                    # Win Percentage
-                    self.tableWidget1.setItem(indy_widget_row_fighter_1,2,QtWidgets.QTableWidgetItem(data_fighter_1[0][-1]))
-                    indy_widget_row_fighter_1 += 1
-                    
-                except IndexError:
-                    self.tableWidget1.setItem(indy_widget_row_fighter_1,0,QtWidgets.QTableWidgetItem('0'))
-                    self.tableWidget1.setItem(indy_widget_row_fighter_1,1,QtWidgets.QTableWidgetItem('0'))
-                    self.tableWidget1.setItem(indy_widget_row_fighter_1,2,QtWidgets.QTableWidgetItem('0.00%'))
-                    indy_widget_row_fighter_1 += 1
-                    pass
-                    
-
-
+                if data and len(data) > 0:
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1, 0, self._centered_item(data[0][-3]))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1, 1, self._centered_item(data[0][-2]))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1, 2, self._centered_item(data[0][-1]))
+                else:
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1, 0, self._centered_item('0'))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1, 1, self._centered_item('0'))
+                    self.tableWidget1.setItem(indy_widget_row_fighter_1, 2, self._centered_item('0.00%'))
+                indy_widget_row_fighter_1 += 1
+            # Fighter 2's queries (odd indices)
             else:
+                if data and len(data) > 0:
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2, 0, self._centered_item(data[0][-3]))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2, 1, self._centered_item(data[0][-2]))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2, 2, self._centered_item(data[0][-1]))
+                else:
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2, 0, self._centered_item('0'))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2, 1, self._centered_item('0'))
+                    self.tableWidget2.setItem(indy_widget_row_fighter_2, 2, self._centered_item('0.00%'))
+                indy_widget_row_fighter_2 += 1
 
-                try:
-
-                    data_fighter_2 = s.select_view_row(query, params)
-
-                    self.tableWidget2.setItem(indy_widget_row_fighter_2,0,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][-3])))
-                    self.tableWidget2.setItem(indy_widget_row_fighter_2,1,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][-2])))
-                    self.tableWidget2.setItem(indy_widget_row_fighter_2,2,QtWidgets.QTableWidgetItem(data_fighter_2[0][-1]))
-                    indy_widget_row_fighter_2 += 1
-                    
-                except IndexError:
-                    self.tableWidget2.setItem(indy_widget_row_fighter_2,0,QtWidgets.QTableWidgetItem('0'))
-                    self.tableWidget2.setItem(indy_widget_row_fighter_2,1,QtWidgets.QTableWidgetItem('0'))
-                    self.tableWidget2.setItem(indy_widget_row_fighter_2,2,QtWidgets.QTableWidgetItem('0.00%'))
-                    indy_widget_row_fighter_2 += 1
-                    pass
-
-        
-        # Vs. Other Fighter (All Rows) - (procedure, params)
-        stored_procedures = [
-            ("call SmashBros.headtohead(%s, %s)", (fighter1, fighter2)),
-            ("call SmashBros.headtoheadLocation(%s, %s, %s)", (fighter1, fighter2, map)),
-            ("call SmashBros.headtoheadFightType(%s, %s, %s)", (fighter1, fighter2, matchType)),
-            ("call SmashBros.headtoheadSeason(%s, %s, %s)", (fighter1, fighter2, season)),
-            ("call SmashBros.headtoheadMonth(%s, %s, %s)", (fighter1, fighter2, month)),
-            ("call SmashBros.headtoheadChamp(%s, %s)", (fighter1, fighter2)),
-            ("call SmashBros.headtoheadPPV(%s, %s, %s)", (fighter1, fighter2, ppv))
-        ]
-
-        # Row Number starts at 0 since H2H stats are at the top of the data table in the GUI
+        # Process head-to-head stats
         h2h_widget_row = 0
+        for dataH2H in results['h2h']:
+            self.tableWidget1.setItem(h2h_widget_row, 0, self._centered_item(dataH2H[0]['Wins']))
+            self.tableWidget1.setItem(h2h_widget_row, 1, self._centered_item(dataH2H[0]['Losses']))
+            self.tableWidget1.setItem(h2h_widget_row, 2, self._centered_item(dataH2H[0]['W/L %']))
 
-        # Only attempts to run this if both text boxes are not equal to the original text the GUI assigns originally to the text box
-        if fighter1 != 'Enter Fighter' and fighter2 != 'Enter Fighter':
-            for procedure, params in stored_procedures:
-                dataH2H = s.h2h_query_sql(procedure, params)
-                
-                # Sets each data table box equal to the corresponding dictionary value returned in h2h_query_sql, comes back as a list of dicts
-                self.tableWidget1.setItem(h2h_widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[0]['Wins']))
-                self.tableWidget1.setItem(h2h_widget_row,1,QtWidgets.QTableWidgetItem(dataH2H[0]['Losses']))
-                self.tableWidget1.setItem(h2h_widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[0]['W/L %']))
+            self.tableWidget2.setItem(h2h_widget_row, 0, self._centered_item(dataH2H[1]['Wins']))
+            self.tableWidget2.setItem(h2h_widget_row, 1, self._centered_item(dataH2H[1]['Losses']))
+            self.tableWidget2.setItem(h2h_widget_row, 2, self._centered_item(dataH2H[1]['W/L %']))
+            h2h_widget_row += 1
 
-                self.tableWidget2.setItem(h2h_widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[1]['Wins']))
-                self.tableWidget2.setItem(h2h_widget_row,1,QtWidgets.QTableWidgetItem(dataH2H[1]['Losses']))
-                self.tableWidget2.setItem(h2h_widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[1]['W/L %']))
-                self.ErrorTextBox.setText('')
-                h2h_widget_row += 1
-        elif fighter1 == 'Enter Fighter' or fighter2 == 'Enter Fighter':
-            self.ErrorTextBox.setText('Enter Another Fighter!')
-        elif fighter1 not in fighter_names or fighter2 not in fighter_names:
-            self.ErrorTextBox.setText('Enter Valid Fighter!')
+        # Clear error and restore UI
+        self.ErrorTextBox.setText('')
+        QtWidgets.QApplication.restoreOverrideCursor()
+        self.CheckStatsButton.setEnabled(True)
+        self.CheckStatsButton.setText("Check Stats")
         
                 
 
@@ -608,5 +673,11 @@ if __name__ == "__main__":
     SmashUI = QtWidgets.QDialog()
     ui = Ui_SmashUI()
     ui.setupUi(SmashUI)
+    SmashUI.setWindowTitle("Super Smash Bros Stats")
+
+    # Fixed size optimized for MacBook Pro (bigger than original 1431x901)
+    # This works well on 14"/16" MacBook Pro and external monitors
+    SmashUI.setFixedSize(1800, 1171)  # Slightly reduced to fit W/L % column
+
     SmashUI.show()
     sys.exit(app.exec_())

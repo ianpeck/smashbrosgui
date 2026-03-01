@@ -16,11 +16,16 @@ region = "us-east-2a"
 dbname = os.environ.get('awsdb')
 
 # ========= Functions =========
+def get_connection():
+    return pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
+
 # Selects a list of dicts of information from a duo of fighters
-def h2h_query_sql(query, params=None):
-    connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
-    with connection:
-        cur = connection.cursor()
+def h2h_query_sql(query, params=None, conn=None):
+    own_conn = conn is None
+    if own_conn:
+        conn = get_connection()
+    try:
+        cur = conn.cursor()
         if params:
             cur.execute(query, params)
         else:
@@ -45,12 +50,17 @@ def h2h_query_sql(query, params=None):
             elif i == 5:
                 fighter2_dict['W/L %'] = data
         return [fighter1_dict, fighter2_dict]
+    finally:
+        if own_conn:
+            conn.close()
 
 # Creates a list of values found in a column
-def select_list(query, columnnumber, params=None):
-    connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
-    with connection:
-        cur = connection.cursor()
+def select_list(query, columnnumber, params=None, conn=None):
+    own_conn = conn is None
+    if own_conn:
+        conn = get_connection()
+    try:
+        cur = conn.cursor()
         if params:
             cur.execute(query, params)
         else:
@@ -60,12 +70,17 @@ def select_list(query, columnnumber, params=None):
         for row in data:
             dataList.append(row[columnnumber])
         return dataList
+    finally:
+        if own_conn:
+            conn.close()
 
 # Selects row(s) from a table, a tuple or tuples inside of a list
-def select_view_row(query, params=None):
-    connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
-    with connection:
-        cur = connection.cursor()
+def select_view_row(query, params=None, conn=None):
+    own_conn = conn is None
+    if own_conn:
+        conn = get_connection()
+    try:
+        cur = conn.cursor()
         if params:
             cur.execute(query, params)
         else:
@@ -75,8 +90,11 @@ def select_view_row(query, params=None):
         for row in data:
             dataList.append(row)
         return dataList
+    finally:
+        if own_conn:
+            conn.close()
 
-# Output for Viewing
-print(select_view_row("SELECT * FROM careerstats WHERE Fighter_Name = %s", ('Mario',)))
-print(h2h_query_sql("call SmashBros.headtohead(%s, %s)", ('Mario', 'Luigi')))
-print(select_list("SELECT * FROM Fighter", 0))
+# Output for Viewing (uncomment to test)
+# print(select_view_row("SELECT * FROM careerstats WHERE Fighter_Name = %s", ('Mario',)))
+# print(h2h_query_sql("call SmashBros.headtohead(%s, %s)", ('Mario', 'Luigi')))
+# print(select_list("SELECT * FROM Fighter", 0))
