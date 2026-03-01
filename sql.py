@@ -17,11 +17,14 @@ dbname = os.environ.get('awsdb')
 
 # ========= Functions =========
 # Selects a list of dicts of information from a duo of fighters
-def h2h_query_sql(query):
+def h2h_query_sql(query, params=None):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
         cur = connection.cursor()
-        cur.execute(query)
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
         fighter_data = cur.fetchone()
         fighter1_dict = {}
         fighter2_dict = {}
@@ -44,11 +47,14 @@ def h2h_query_sql(query):
         return [fighter1_dict, fighter2_dict]
 
 # Creates a list of values found in a column
-def select_list(query, columnnumber):
+def select_list(query, columnnumber, params=None):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
         cur = connection.cursor()
-        cur.execute(query)
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
         data = cur.fetchall()
         dataList = []
         for row in data:
@@ -56,11 +62,14 @@ def select_list(query, columnnumber):
         return dataList
 
 # Selects row(s) from a table, a tuple or tuples inside of a list
-def select_view_row(query):
+def select_view_row(query, params=None):
     connection = pymysql.connect(host=endpoint, database=dbname, user=user, port=port, password=password)
     with connection:
         cur = connection.cursor()
-        cur.execute(query)
+        if params:
+            cur.execute(query, params)
+        else:
+            cur.execute(query)
         data = cur.fetchall()
         dataList = []
         for row in data:
@@ -68,6 +77,6 @@ def select_view_row(query):
         return dataList
 
 # Output for Viewing
-print(select_view_row("SELECT * FROM careerstats WHERE Fighter_Name = 'Mario'"))
-print(h2h_query_sql("call SmashBros.headtohead('Mario','Luigi')"))
-print(select_list("SELECT * FROM Fighter",0))
+print(select_view_row("SELECT * FROM careerstats WHERE Fighter_Name = %s", ('Mario',)))
+print(h2h_query_sql("call SmashBros.headtohead(%s, %s)", ('Mario', 'Luigi')))
+print(select_list("SELECT * FROM Fighter", 0))

@@ -15,8 +15,8 @@ class Ui_SmashUI(object):
         self.tabWidget.setElideMode(QtCore.Qt.ElideNone)
         self.tabWidget.setObjectName("tabWidget")
         with open('theme/darkeum.qss', 'r', encoding='utf-8') as file:
-            str = file.read()
-        self.tabWidget.setStyleSheet(str)
+            theme_content = file.read()
+        self.tabWidget.setStyleSheet(theme_content)
 
         # Head to Head Tab
 
@@ -495,37 +495,39 @@ class Ui_SmashUI(object):
         dataH2H = []
         fighter_names = s.select_list('SELECT * FROM Fighter', 0)
 
-        # Individual Stats Queries
-        queries = ["SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter1, map.replace("'","''")),
-        "SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = '{}' AND Location_Name = '{}'".format(fighter2, map.replace("'","''")),
-        "SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = '{}' AND FightType = '{}'".format(fighter1, matchType),
-        "SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = '{}' AND FightType = '{}'".format(fighter2, matchType),
-        "SELECT * FROM champfightstats WHERE Fighter_Name = '{}'".format(fighter1),
-        "SELECT * FROM champfightstats WHERE Fighter_Name = '{}'".format(fighter2),
-        "SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = '{}' AND PPV = '{}'".format(fighter1, ppv),
-        "SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = '{}' AND PPV = '{}'".format(fighter2, ppv),
-        "SELECT * FROM defendingtitle WHERE Fighter_Name = '{}'".format(fighter1),
-        "SELECT * FROM defendingtitle WHERE Fighter_Name = '{}'".format(fighter2),
-        "SELECT * FROM careerstats WHERE Fighter_Name = '{}'".format(fighter1),
-        "SELECT * FROM careerstats WHERE Fighter_Name = '{}'".format(fighter2),
-        "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter1, season),
-        "SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = '{}' AND Season = '{}'".format(fighter2, season),
-        "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter1, brand),
-        "SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = '{}' AND Brand = '{}'".format(fighter2, brand)]
+        # Individual Stats Queries (query, params)
+        queries = [
+            ("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = %s AND Location_Name = %s", (fighter1, map)),
+            ("SELECT * FROM CareerStatsByLocation WHERE Fighter_Name = %s AND Location_Name = %s", (fighter2, map)),
+            ("SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = %s AND FightType = %s", (fighter1, matchType)),
+            ("SELECT * FROM CareerStatsByFightType WHERE Fighter_Name = %s AND FightType = %s", (fighter2, matchType)),
+            ("SELECT * FROM champfightstats WHERE Fighter_Name = %s", (fighter1,)),
+            ("SELECT * FROM champfightstats WHERE Fighter_Name = %s", (fighter2,)),
+            ("SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = %s AND PPV = %s", (fighter1, ppv)),
+            ("SELECT * FROM CareerStatsByPPV WHERE Fighter_Name = %s AND PPV = %s", (fighter2, ppv)),
+            ("SELECT * FROM defendingtitle WHERE Fighter_Name = %s", (fighter1,)),
+            ("SELECT * FROM defendingtitle WHERE Fighter_Name = %s", (fighter2,)),
+            ("SELECT * FROM careerstats WHERE Fighter_Name = %s", (fighter1,)),
+            ("SELECT * FROM careerstats WHERE Fighter_Name = %s", (fighter2,)),
+            ("SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = %s AND Season = %s", (fighter1, season)),
+            ("SELECT * FROM CareerStatsBySeason WHERE Fighter_Name = %s AND Season = %s", (fighter2, season)),
+            ("SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = %s AND Brand = %s", (fighter1, brand)),
+            ("SELECT * FROM CareerStatsByBrand WHERE Fighter_Name = %s AND Brand = %s", (fighter2, brand))
+        ]
 
         # First Row of Individual Stats starts at 7
         indy_widget_row_fighter_1 = 7
         indy_widget_row_fighter_2 = 7
 
         # Loops through our queries list and runs them, assigns the results to their correct spots in the GUI data table
-        for i, query in enumerate(queries):
+        for i, (query, params) in enumerate(queries):
 
         # Fighter 1's queries, if there is no Fighter 1, error will be caught and 0's will be assigned to Wins/Losses/Win %
             if i % 2 == 0:
 
                 try:
 
-                    data_fighter_1 = s.select_view_row(query)
+                    data_fighter_1 = s.select_view_row(query, params)
 
                     # Wins
                     self.tableWidget1.setItem(indy_widget_row_fighter_1,0,QtWidgets.QTableWidgetItem(str(data_fighter_1[0][-3])))
@@ -548,7 +550,7 @@ class Ui_SmashUI(object):
 
                 try:
 
-                    data_fighter_2 = s.select_view_row(query)
+                    data_fighter_2 = s.select_view_row(query, params)
 
                     self.tableWidget2.setItem(indy_widget_row_fighter_2,0,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][-3])))
                     self.tableWidget2.setItem(indy_widget_row_fighter_2,1,QtWidgets.QTableWidgetItem(str(data_fighter_2[0][-2])))
@@ -563,22 +565,24 @@ class Ui_SmashUI(object):
                     pass
 
         
-        # Vs. Other Fighter (All Rows)
-        stored_procedures = ["call SmashBros.headtohead('{}','{}');".format(fighter1, fighter2), 
-        "call SmashBros.headtoheadLocation('{}','{}','{}');".format(fighter1, fighter2, map.replace("'","''")),
-        "call SmashBros.headtoheadFightType('{}','{}','{}');".format(fighter1, fighter2, matchType),
-        "call SmashBros.headtoheadSeason('{}','{}','{}');".format(fighter1, fighter2, season), 
-        "call SmashBros.headtoheadMonth('{}','{}','{}');".format(fighter1, fighter2, month), 
-        "call SmashBros.headtoheadChamp('{}','{}');".format(fighter1, fighter2), 
-        "call SmashBros.headtoheadPPV('{}','{}','{}');".format(fighter1, fighter2, ppv)]
+        # Vs. Other Fighter (All Rows) - (procedure, params)
+        stored_procedures = [
+            ("call SmashBros.headtohead(%s, %s)", (fighter1, fighter2)),
+            ("call SmashBros.headtoheadLocation(%s, %s, %s)", (fighter1, fighter2, map)),
+            ("call SmashBros.headtoheadFightType(%s, %s, %s)", (fighter1, fighter2, matchType)),
+            ("call SmashBros.headtoheadSeason(%s, %s, %s)", (fighter1, fighter2, season)),
+            ("call SmashBros.headtoheadMonth(%s, %s, %s)", (fighter1, fighter2, month)),
+            ("call SmashBros.headtoheadChamp(%s, %s)", (fighter1, fighter2)),
+            ("call SmashBros.headtoheadPPV(%s, %s, %s)", (fighter1, fighter2, ppv))
+        ]
 
         # Row Number starts at 0 since H2H stats are at the top of the data table in the GUI
         h2h_widget_row = 0
 
         # Only attempts to run this if both text boxes are not equal to the original text the GUI assigns originally to the text box
-        if fighter1 and fighter2 != 'Enter Fighter':
-            for stored_procedure in stored_procedures:
-                dataH2H = s.h2h_query_sql("{}".format(stored_procedure))
+        if fighter1 != 'Enter Fighter' and fighter2 != 'Enter Fighter':
+            for procedure, params in stored_procedures:
+                dataH2H = s.h2h_query_sql(procedure, params)
                 
                 # Sets each data table box equal to the corresponding dictionary value returned in h2h_query_sql, comes back as a list of dicts
                 self.tableWidget1.setItem(h2h_widget_row,0,QtWidgets.QTableWidgetItem(dataH2H[0]['Wins']))
@@ -590,9 +594,9 @@ class Ui_SmashUI(object):
                 self.tableWidget2.setItem(h2h_widget_row,2,QtWidgets.QTableWidgetItem(dataH2H[1]['W/L %']))
                 self.ErrorTextBox.setText('')
                 h2h_widget_row += 1
-        elif fighter1 or fighter2 == 'Enter Fighter':
+        elif fighter1 == 'Enter Fighter' or fighter2 == 'Enter Fighter':
             self.ErrorTextBox.setText('Enter Another Fighter!')
-        elif fighter1 or fighter2 not in fighter_names:
+        elif fighter1 not in fighter_names or fighter2 not in fighter_names:
             self.ErrorTextBox.setText('Enter Valid Fighter!')
         
                 
